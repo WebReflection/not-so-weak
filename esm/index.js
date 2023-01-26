@@ -1,3 +1,5 @@
+/*! (c) Andrea Giammarchi - ISC */
+
 const {iterator, species} = Symbol;
 
 const refs = new WeakMap;
@@ -10,9 +12,6 @@ const set = value => {
 
 const get = value => refs.get(value) || set(value);
 
-/**
- * @implements globalThis.WeakSet
- */
 export class NSWeakSet extends Set {
   static get [species]() { return NSWeakSet };
   // <same>
@@ -73,9 +72,6 @@ export class NSWeakSet extends Set {
   *values() { yield *this[iterator]() }
 }
 
-/**
- * @implements globalThis.WeakMap
- */
 export class NSWeakMap extends Map {
   static get [species]() { return NSWeakMap };
   // <same>

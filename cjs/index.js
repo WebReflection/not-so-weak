@@ -1,4 +1,6 @@
 'use strict';
+/*! (c) Andrea Giammarchi - ISC */
+
 const {iterator, species} = Symbol;
 
 const refs = new WeakMap;
@@ -11,9 +13,6 @@ const set = value => {
 
 const get = value => refs.get(value) || set(value);
 
-/**
- * @implements globalThis.WeakSet
- */
 class NSWeakSet extends Set {
   static get [species]() { return NSWeakSet };
   // <same>
@@ -75,9 +74,6 @@ class NSWeakSet extends Set {
 }
 exports.NSWeakSet = NSWeakSet
 
-/**
- * @implements globalThis.WeakMap
- */
 class NSWeakMap extends Map {
   static get [species]() { return NSWeakMap };
   // <same>

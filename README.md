@@ -7,6 +7,7 @@
 Iterable [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) and [WeakSet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet) through [FinalizationRegistry](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry) and [WeakRef](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef) primitives, complementing the [WeakValue](https://github.com/WebReflection/weak-value#readme) module.
 
 ```js
+// const {NSWeakSet, NSWeakMap} = require('not-so-weak');
 import {NSWeakSet, NSWeakMap} from 'not-so-weak';
 
 // class NSWeakSet<T extends object> extends WeakSet implements Set {}
@@ -24,7 +25,7 @@ setTimeout(() => {
   gc();
   console.assert(ws.size === 0);
   console.assert(wm.size === 0);
-console.assert([...wm].length === 0);
+  console.assert([...wm].length === 0);
 });
 ```
 
