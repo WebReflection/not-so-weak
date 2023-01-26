@@ -1,0 +1,47 @@
+{
+  "name": "not-so-weak",
+  "version": "0.0.0",
+  "main": "./cjs/index.js",
+  "scripts": {
+    "build": "npm run cjs && npm run test",
+    "cjs": "ascjs esm cjs",
+    "test": "c8 node --expose-gc test/index.js",
+    "coverage": "mkdir -p ./coverage; c8 report --reporter=text-lcov > ./coverage/lcov.info"
+  },
+  "types": "./types/index.d.ts",
+  "keywords": [
+    "WeakMap",
+    "WeakSet",
+    "iterable"
+  ],
+  "author": "Andrea Giammarchi",
+  "license": "ISC",
+  "devDependencies": {
+    "ascjs": "^5.0.1",
+    "c8": "^7.12.0"
+  },
+  "module": "./esm/index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "default": "./cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReflection/not-so-weak.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WebReflection/not-so-weak/issues"
+  },
+  "homepage": "https://github.com/WebReflection/not-so-weak#readme",
+  "description": "",
+  "dependencies": {
+    "typescript": "^4.9.4"
+  }
+}
