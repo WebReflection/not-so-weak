@@ -12,6 +12,7 @@ import {NSWeakSet, NSWeakMap, NSWeakValue} from 'not-so-weak';
 
 // class NSWeakSet<T extends object> extends WeakSet implements Set {}
 // class NSWeakMap<K extends object, V> extends WeakMap implements Map {}
+// class NSWeakValue<K, V extends object> extends Map {}
 
 // node --expose-gc example
 const ws = new NSWeakSet([{}]);
