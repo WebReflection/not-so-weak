@@ -15,10 +15,7 @@ const get = value => refs.get(value) || set(value);
 export class NSWeakSet extends Set {
   static get [species]() { return NSWeakSet };
   // <same>
-  #registry = new FinalizationRegistry(ref => {
-    this.#registry.unregister(ref);
-    super.delete(ref);
-  });
+  #registry = new FinalizationRegistry(ref => super.delete(ref));
   #drop(ref) {
     const had = super.delete(ref);
     if (had)
@@ -46,7 +43,7 @@ export class NSWeakSet extends Set {
   add(value) {
     const ref = get(value);
     if (!super.has(ref)) {
-      this.#registry.register(value, ref);
+      this.#registry.register(value, ref, ref);
       super.add(ref);
     }
     return this;
@@ -75,10 +72,7 @@ export class NSWeakSet extends Set {
 export class NSWeakMap extends Map {
   static get [species]() { return NSWeakMap };
   // <same>
-  #registry = new FinalizationRegistry(ref => {
-    this.#registry.unregister(ref);
-    super.delete(ref);
-  });
+  #registry = new FinalizationRegistry(ref => super.delete(ref));
   #drop(ref) {
     const had = super.delete(ref);
     if (had)
@@ -99,7 +93,7 @@ export class NSWeakMap extends Map {
       this.set(key, value);
   }
   clear() {
-    for (const [ref] of super[iterator]())
+    for (const ref of super.keys())
       this.#registry.unregister(ref);
     super.clear();
   }
@@ -113,9 +107,8 @@ export class NSWeakMap extends Map {
   set(key, value) {
     const ref = get(key);
     if (!super.has(ref))
-      this.#registry.register(key, ref);
-    super.set(ref, value);
-    return this;
+      this.#registry.register(key, ref, ref);
+    return super.set(ref, value);
   }
   *[iterator]() {
     for (const [ref, value] of super[iterator]()) {
@@ -124,6 +117,66 @@ export class NSWeakMap extends Map {
         yield [key, value];
       else
         this.#drop(ref);
+    }
+  }
+  *entries() {
+    yield *this[iterator]();
+  }
+  *keys() {
+    for (const [key] of this)
+      yield key;
+  }
+  *values() {
+    for (const [_, value] of this)
+      yield value;
+  }
+}
+
+export class NSWeakValue extends Map {
+  static get [species]() { return NSWeakValue };
+  #registry = new FinalizationRegistry(key => super.delete(key));
+  get size() { return [...this].length }
+  #drop(key, ref) {
+    const had = super.delete(key);
+    if (had)
+      this.#registry.unregister(ref);
+    return had;
+  }
+  constructor(entries = []) {
+    super();
+    for (const [key, value] of entries)
+      this.set(key, value);
+  }
+  clear() {
+    for (const ref of super.values())
+      this.#registry.unregister(ref);
+    super.clear();
+  }
+  delete(key) {
+    return this.#drop(key, super.get(key));
+  }
+  forEach(callback, thisArg) {
+    for (const [key, value] of [...this])
+      callback.call(thisArg, value, key, this);
+  }
+  get(key) {
+    return super.get(key)?.deref();
+  }
+  set(key, value) {
+    let ref = super.get(key);
+    if (ref)
+      this.#registry.unregister(ref);
+    ref = get(value);
+    this.#registry.register(value, key, ref);
+    return super.set(key, ref);
+  }
+  *[iterator]() {
+    for (const [key, ref] of super[iterator]()) {
+      const value = ref.deref();
+      if (value)
+        yield [key, value];
+      else
+        this.#drop(key, ref);
     }
   }
   *entries() {

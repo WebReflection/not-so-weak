@@ -58,3 +58,9 @@ export class NSWeakMap<K extends object, V> extends WeakMap {
    */
   values(): IterableIterator<V>;
 }
+
+
+/**
+ * A Map with weak values insted of keys.
+ */
+export class NSWeakValue<K, V extends object> extends Map {}

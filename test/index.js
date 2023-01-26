@@ -1,4 +1,4 @@
-import {NSWeakSet, NSWeakMap} from '../esm/index.js';
+import {NSWeakSet, NSWeakMap, NSWeakValue} from '../esm/index.js';
 
 const assert = (got, expected, message = {got, expected}) => {
   if (!Object.is(got, expected)) {
@@ -9,18 +9,36 @@ const assert = (got, expected, message = {got, expected}) => {
 
 assert(NSWeakSet[Symbol.species], NSWeakSet);
 assert(NSWeakMap[Symbol.species], NSWeakMap);
+assert(NSWeakValue[Symbol.species], NSWeakValue);
 
 const ws = new NSWeakSet([{}]);
 const wm = new NSWeakMap([[{}, 'value']]);
+const wv = new NSWeakValue([['value', {}]]);
 
-assert(ws.size, 1, 'ok constructor');
-assert(wm.size, 1, 'ok constructor');
+assert(ws.size, 1, 'ok ws constructor');
+assert(wm.size, 1, 'ok wm constructor');
+assert(wv.size, 1, 'ok wv constructor');
 
+gc();
 setTimeout(() => {
   gc();
-  assert(ws.size, 0, 'ok ws collector');
-  assert(wm.size, 0, 'ok wm collector');
-});
+  setTimeout(() => {
+    gc();
+    assert(ws.size, 0, 'ok ws collector');
+    assert(wm.size, 0, 'ok wm collector');
+    assert(wv.size, 0, 'ok wv collector');
+
+    ws.add({});
+    wm.set({}, 'value');
+    wv.set('value', {});
+    setTimeout(() => {
+      gc();
+      assert(ws.size, 0, 'ok ws collector');
+      assert(wm.size, 0, 'ok wm collector');
+      assert(wv.size, 0, 'ok wv collector');
+    });
+  }, 100);
+}, 100);
 
 const wsAPI = new NSWeakSet;
 wsAPI.add(ws);
@@ -76,3 +94,32 @@ wmAPI.set(wm, 1);
 assert(wmAPI.size, 1);
 wmAPI.clear();
 assert(wmAPI.size, 0);
+
+
+const wvAPI = new NSWeakValue;
+wvAPI.set('value', wm);
+assert(wvAPI.size, 1, 'ok wv set');
+wvAPI.set('value', wv);
+assert(wvAPI.size, 1, 'ok wv repeated add');
+assert(wvAPI.has('value'), true, 'ok wv has');
+assert(wvAPI.get('value'), wv, 'ok wv get');
+assert([...wvAPI.keys()][0], 'value', 'ok wv keys check');
+assert([...wvAPI.values()][0], wv, 'ok wv values check');
+assert([...wvAPI.entries()][0][0], 'value', 'ok wv entries keys check');
+assert([...wvAPI.entries()][0][1], wv, 'ok wv entries values check');
+let wveach = 0;
+wvAPI.forEach(function (value, key, map) {
+  wveach++;
+  assert(this, wv);
+  assert(value, wv);
+  assert(key, 'value');
+  assert(map, wvAPI);
+}, wv);
+assert(wveach, 1, 'ok wv forEach');
+assert(wvAPI.delete('value'), true, 'ok wv delete');
+assert(wvAPI.delete('value'), false, 'ok wv repeated delete');
+assert(wvAPI.has('value'), false, 'ok wv repeated has');
+wvAPI.set(1, wv);
+assert(wvAPI.size, 1);
+wvAPI.clear();
+assert(wvAPI.size, 0);
