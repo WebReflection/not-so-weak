@@ -1,6 +1,6 @@
 {
   "name": "not-so-weak",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "main": "./cjs/index.js",
   "scripts": {
     "build": "npm run cjs && npm run test",
