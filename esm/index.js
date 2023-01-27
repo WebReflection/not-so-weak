@@ -12,8 +12,7 @@ const set = value => {
 
 const get = value => refs.get(value) || set(value);
 
-export class NSWeakSet extends Set {
-  static get [species]() { return NSWeakSet };
+export class WSet extends Set {
   // <same>
   #registry = new FinalizationRegistry(ref => super.delete(ref));
   #drop(ref) {
@@ -69,8 +68,7 @@ export class NSWeakSet extends Set {
   *values() { yield *this[iterator]() }
 }
 
-export class NSWeakMap extends Map {
-  static get [species]() { return NSWeakMap };
+export class WKey extends Map {
   // <same>
   #registry = new FinalizationRegistry(ref => super.delete(ref));
   #drop(ref) {
@@ -132,8 +130,7 @@ export class NSWeakMap extends Map {
   }
 }
 
-export class NSWeakValue extends Map {
-  static get [species]() { return NSWeakValue };
+export class WValue extends Map {
   #registry = new FinalizationRegistry(key => super.delete(key));
   get size() { return [...this].length }
   #drop(key, ref) {

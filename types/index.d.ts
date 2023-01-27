@@ -1,12 +1,12 @@
 /**
  * An iterable WeakSet.
  */
-export class NSWeakSet<T extends object> extends WeakSet {
+export class WSet<T extends object> extends WeakSet {
   clear(): void;
   /**
    * Executes a provided function once per each value in the WeakSet object, in insertion order.
    */
-  forEach(callbackfn: (value: T, value2: T, set: NSWeakSet<T>) => void, thisArg?: any): void;
+  forEach(callbackfn: (value: T, value2: T, set: WSet<T>) => void, thisArg?: any): void;
   /**
    * @returns the number of (unique) elements in the WeakSet.
    */
@@ -31,12 +31,12 @@ export class NSWeakSet<T extends object> extends WeakSet {
 /**
  * An iterable WeakMap.
  */
-export class NSWeakMap<K extends object, V> extends WeakMap {
+export class WKey<K extends object, V> extends WeakMap {
   clear(): void;
   /**
    * Executes a provided function once per each key/value pair in the WeakMap, in insertion order.
    */
-  forEach(callbackfn: (value: V, key: K, map: NSWeakMap) => void, thisArg?: any): void;
+  forEach(callbackfn: (value: V, key: K, map: WKey) => void, thisArg?: any): void;
   /**
    * @returns the number of elements in the WeakMap.
    */
@@ -63,4 +63,4 @@ export class NSWeakMap<K extends object, V> extends WeakMap {
 /**
  * A Map with weak values insted of keys.
  */
-export class NSWeakValue<K, V extends object> extends Map {}
+export class WValue<K, V extends object> extends Map {}

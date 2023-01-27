@@ -40,8 +40,5 @@
     "url": "https://github.com/WebReflection/not-so-weak/issues"
   },
   "homepage": "https://github.com/WebReflection/not-so-weak#readme",
-  "description": "",
-  "dependencies": {
-    "typescript": "^4.9.4"
-  }
+  "description": "Iterable WeakMap, WeakSet and WeakValue."
 }

@@ -4,20 +4,20 @@
 
 <sup>**Social Media Photo by [Pete Nuij](https://unsplash.com/@pete_nuij) on [Unsplash](https://unsplash.com/)**</sup>
 
-Iterable [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) and [WeakSet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet) through [FinalizationRegistry](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry) and [WeakRef](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef) primitives, reimplementing also the [WeakValue](https://github.com/WebReflection/weak-value#readme) module without the *callback* and/or non standard API signatures.
+Iterable [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) (*WKey*) and [WeakSet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet) (*WSet*) through [FinalizationRegistry](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry) and [WeakRef](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef) primitives, reimplementing also the [WeakValue](https://github.com/WebReflection/weak-value#readme) (*WValue*) module without the *callback* and/or non standard API signatures.
 
 ```js
-// const {NSWeakSet, NSWeakMap} = require('not-so-weak');
-import {NSWeakSet, NSWeakMap, NSWeakValue} from 'not-so-weak';
+// const {WSet, WKey, WValue} = require('not-so-weak');
+import {WSet, WKey, WValue} from 'not-so-weak';
 
-// class NSWeakSet<T extends object> extends WeakSet implements Set {}
-// class NSWeakMap<K extends object, V> extends WeakMap implements Map {}
-// class NSWeakValue<K, V extends object> extends Map {}
+// class WSet<T extends object> extends WeakSet implements Set {}
+// class WKey<K extends object, V> extends WeakMap implements Map {}
+// class WValue<K, V extends object> extends Map {}
 
 // node --expose-gc example
-const ws = new NSWeakSet([{}]);
-const wm = new NSWeakMap([[{}, 'value']]);
-const wv = new NSWeakValue([['value', {}]]);
+const ws = new WSet([{}]);
+const wm = new WKey([[{}, 'value']]);
+const wv = new WValue([['value', {}]]);
 
 console.assert(ws.size === 1);
 console.assert(wm.size === 1);

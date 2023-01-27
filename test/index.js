@@ -1,4 +1,4 @@
-import {NSWeakSet, NSWeakMap, NSWeakValue} from '../esm/index.js';
+import {WSet, WKey, WValue} from '../esm/index.js';
 
 const assert = (got, expected, message = {got, expected}) => {
   if (!Object.is(got, expected)) {
@@ -7,13 +7,15 @@ const assert = (got, expected, message = {got, expected}) => {
   }
 };
 
-assert(NSWeakSet[Symbol.species], NSWeakSet);
-assert(NSWeakMap[Symbol.species], NSWeakMap);
-assert(NSWeakValue[Symbol.species], NSWeakValue);
+// Removed as MDN warning suggests
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/species
+// assert(WSet[Symbol.species], WSet);
+// assert(WKey[Symbol.species], WKey);
+// assert(WValue[Symbol.species], WValue);
 
-const ws = new NSWeakSet([{}]);
-const wm = new NSWeakMap([[{}, 'value']]);
-const wv = new NSWeakValue([['value', {}]]);
+const ws = new WSet([{}]);
+const wm = new WKey([[{}, 'value']]);
+const wv = new WValue([['value', {}]]);
 
 assert(ws.size, 1, 'ok ws constructor');
 assert(wm.size, 1, 'ok wm constructor');
@@ -40,7 +42,7 @@ setTimeout(() => {
   }, 100);
 }, 100);
 
-const wsAPI = new NSWeakSet;
+const wsAPI = new WSet;
 wsAPI.add(ws);
 assert(wsAPI.size, 1, 'ok ws add');
 wsAPI.add(ws);
@@ -67,7 +69,7 @@ assert(wsAPI.size, 1);
 wsAPI.clear();
 assert(wsAPI.size, 0);
 
-const wmAPI = new NSWeakMap;
+const wmAPI = new WKey;
 wmAPI.set(wm, 'value');
 assert(wmAPI.size, 1, 'ok wm set');
 wmAPI.set(wm, 'new value');
@@ -96,7 +98,7 @@ wmAPI.clear();
 assert(wmAPI.size, 0);
 
 
-const wvAPI = new NSWeakValue;
+const wvAPI = new WValue;
 wvAPI.set('value', wm);
 assert(wvAPI.size, 1, 'ok wv set');
 wvAPI.set('value', wv);
