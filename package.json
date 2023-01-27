@@ -12,6 +12,7 @@
   "keywords": [
     "WeakMap",
     "WeakSet",
+    "Weakvalue",
     "iterable"
   ],
   "author": "Andrea Giammarchi",
