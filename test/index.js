@@ -14,12 +14,29 @@ const assert = (got, expected, message = {got, expected}) => {
 // assert(WValue[Symbol.species], WValue);
 
 const ws = new WSet([{}]);
-const wm = new WKey([[{}, 'value']]);
-const wv = new WValue([['value', {}]]);
 
-assert(ws.size, 1, 'ok ws constructor');
-assert(wm.size, 1, 'ok wm constructor');
-assert(wv.size, 1, 'ok wv constructor');
+let wkFinalization = false;
+const wk = new WKey;
+wk.set({}, 'value', function (value) {
+  assert(value, 'value', 'wk finalization callback');
+  assert(this, wk, 'wk finalization context');
+  wkFinalization = true;
+});
+
+let wvFinalization = false;
+const wv = new WValue;
+wv.set('value', {}, function (key) {
+  assert(key, 'value', 'wv finalization callback');
+  assert(this, wv, 'wv finalization context');
+  wvFinalization = true;
+});
+
+const wvNoCallback = new WValue([['value', {}]]);
+
+assert(ws.size, 1, 'ok ws size');
+assert(wk.size, 1, 'ok wk size');
+assert(wv.size, 1, 'ok wv size');
+assert(wvNoCallback.size, 1, 'ok wvNoCallback size');
 
 gc();
 setTimeout(() => {
@@ -27,16 +44,19 @@ setTimeout(() => {
   setTimeout(() => {
     gc();
     assert(ws.size, 0, 'ok ws collector');
-    assert(wm.size, 0, 'ok wm collector');
+    assert(wk.size, 0, 'ok wk collector');
     assert(wv.size, 0, 'ok wv collector');
+    assert(wvNoCallback.size, 0, 'ok wv collector');
+    assert(wkFinalization, true, 'ok wk finalization');
+    assert(wvFinalization, true, 'ok wv finalization');
 
     ws.add({});
-    wm.set({}, 'value');
+    wk.set({}, 'value');
     wv.set('value', {});
     setTimeout(() => {
       gc();
       assert(ws.size, 0, 'ok ws collector');
-      assert(wm.size, 0, 'ok wm collector');
+      assert(wk.size, 0, 'ok wk collector');
       assert(wv.size, 0, 'ok wv collector');
     });
   }, 100);
@@ -69,38 +89,36 @@ assert(wsAPI.size, 1);
 wsAPI.clear();
 assert(wsAPI.size, 0);
 
-const wmAPI = new WKey;
-wmAPI.set(wm, 'value');
-assert(wmAPI.size, 1, 'ok wm set');
-wmAPI.set(wm, 'new value');
-assert(wmAPI.size, 1, 'ok wm repeated add');
-assert(wmAPI.has(wm), true, 'ok wm has');
-assert(wmAPI.get(wm), 'new value', 'ok wm get');
-assert([...wmAPI.keys()][0], wm, 'ok wm keys check');
-assert([...wmAPI.values()][0], 'new value', 'ok wm values check');
-assert([...wmAPI.entries()][0][0], wm, 'ok wm entries keys check');
-assert([...wmAPI.entries()][0][1], 'new value', 'ok wm entries values check');
-let wmeach = 0;
-wmAPI.forEach(function (value, key, map) {
-  wmeach++;
-  assert(this, wm);
+const wkAPI = new WKey([[wk, 'value']]);
+assert(wkAPI.size, 1, 'ok wk constructor');
+wkAPI.set(wk, 'new value');
+assert(wkAPI.size, 1, 'ok wk repeated add');
+assert(wkAPI.has(wk), true, 'ok wk has');
+assert(wkAPI.get(wk), 'new value', 'ok wk get');
+assert([...wkAPI.keys()][0], wk, 'ok wk keys check');
+assert([...wkAPI.values()][0], 'new value', 'ok wk values check');
+assert([...wkAPI.entries()][0][0], wk, 'ok wk entries keys check');
+assert([...wkAPI.entries()][0][1], 'new value', 'ok wk entries values check');
+let wkeach = 0;
+wkAPI.forEach(function (value, key, map) {
+  wkeach++;
+  assert(this, wk);
   assert(value, 'new value');
-  assert(key, wm);
-  assert(map, wmAPI);
-}, wm);
-assert(wmeach, 1, 'ok wm forEach');
-assert(wmAPI.delete(wm), true, 'ok wm delete');
-assert(wmAPI.delete(wm), false, 'ok wm repeated delete');
-assert(wmAPI.has(wm), false, 'ok wm repeated has');
-wmAPI.set(wm, 1);
-assert(wmAPI.size, 1);
-wmAPI.clear();
-assert(wmAPI.size, 0);
+  assert(key, wk);
+  assert(map, wkAPI);
+}, wk);
+assert(wkeach, 1, 'ok wk forEach');
+assert(wkAPI.delete(wk), true, 'ok wk delete');
+assert(wkAPI.delete(wk), false, 'ok wk repeated delete');
+assert(wkAPI.has(wk), false, 'ok wk repeated has');
+wkAPI.set(wk, 1);
+assert(wkAPI.size, 1);
+wkAPI.clear();
+assert(wkAPI.size, 0);
 
 
-const wvAPI = new WValue;
-wvAPI.set('value', wm);
-assert(wvAPI.size, 1, 'ok wv set');
+const wvAPI = new WValue([['value', wk]]);
+assert(wvAPI.size, 1, 'ok wv constructor');
 wvAPI.set('value', wv);
 assert(wvAPI.size, 1, 'ok wv repeated add');
 assert(wvAPI.has('value'), true, 'ok wv has');

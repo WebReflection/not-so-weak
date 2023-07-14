@@ -1,7 +1,7 @@
 'use strict';
 /*! (c) Andrea Giammarchi - ISC */
 
-const {iterator, species} = Symbol;
+const { iterator } = Symbol;
 
 const refs = new WeakMap;
 
@@ -70,9 +70,13 @@ class WSet extends Set {
 }
 exports.WSet = WSet
 
+const noop = _ => {};
+
 class WKey extends Map {
   // <same>
-  #registry = new FinalizationRegistry(ref => super.delete(ref));
+  #registry = new FinalizationRegistry(
+    ([ref, callback, value]) => (super.delete(ref), callback.call(this, value))
+  );
   #drop(ref) {
     const had = super.delete(ref);
     if (had)
@@ -104,10 +108,10 @@ class WKey extends Map {
   get(key) {
     return super.get(refs.get(key));
   }
-  set(key, value) {
+  set(key, value, callback = noop) {
     const ref = get(key);
     if (!super.has(ref))
-      this.#registry.register(key, ref, ref);
+      this.#registry.register(key, [ref, callback, value], ref);
     return super.set(ref, value);
   }
   *[iterator]() {
@@ -134,7 +138,9 @@ class WKey extends Map {
 exports.WKey = WKey
 
 class WValue extends Map {
-  #registry = new FinalizationRegistry(key => super.delete(key));
+  #registry = new FinalizationRegistry(
+    ([key, callback]) => (super.delete(key), callback.call(this, key))
+  );
   get size() { return [...this].length }
   #drop(key, ref) {
     const had = super.delete(key);
@@ -162,12 +168,12 @@ class WValue extends Map {
   get(key) {
     return super.get(key)?.deref();
   }
-  set(key, value) {
+  set(key, value, callback = noop) {
     let ref = super.get(key);
     if (ref)
       this.#registry.unregister(ref);
     ref = get(value);
-    this.#registry.register(value, key, ref);
+    this.#registry.register(value, [key, callback], ref);
     return super.set(key, ref);
   }
   *[iterator]() {

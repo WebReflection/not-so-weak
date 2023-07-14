@@ -4,7 +4,7 @@
 
 <sup>**Social Media Photo by [Pete Nuij](https://unsplash.com/@pete_nuij) on [Unsplash](https://unsplash.com/)**</sup>
 
-Iterable [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) (*WKey*) and [WeakSet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet) (*WSet*) through [FinalizationRegistry](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry) and [WeakRef](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef) primitives, reimplementing also the [WeakValue](https://github.com/WebReflection/weak-value#readme) (*WValue*) module without the *callback* and/or non standard API signatures.
+Iterable [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) (*WKey*) and [WeakSet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet) (*WSet*) through [FinalizationRegistry](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/FinalizationRegistry) and [WeakRef](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakRef) primitives, reimplementing also the [WeakValue](https://github.com/WebReflection/weak-value#readme) (*WValue*) module, including the optional *callback* for collected values.
 
 ```js
 // const {WSet, WKey, WValue} = require('not-so-weak');
@@ -17,7 +17,13 @@ import {WSet, WKey, WValue} from 'not-so-weak';
 // node --expose-gc example
 const ws = new WSet([{}]);
 const wm = new WKey([[{}, 'value']]);
-const wv = new WValue([['value', {}]]);
+
+const wv = new WValue;
+wv.set('value', {}, function (key) {
+  console.assert(this === wv);
+  console.assert(key === 'value');
+  console.log(key, 'value collected');
+});
 
 console.assert(ws.size === 1);
 console.assert(wm.size === 1);

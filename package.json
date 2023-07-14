@@ -18,8 +18,8 @@
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
-    "ascjs": "^5.0.1",
-    "c8": "^7.12.0"
+    "ascjs": "^6.0.2",
+    "c8": "^8.0.0"
   },
   "module": "./esm/index.js",
   "type": "module",
